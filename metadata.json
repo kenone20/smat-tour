@@ -1,5 +1,7 @@
 {
   "name": "SmartTour AI",
   "description": "An AI-powered travel itinerary generator that creates personalized, day-by-day plans with maps, booking links, and cost estimates. Instantly craft your perfect trip based on your destination, budget, and interests.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "microphone"
+  ]
 }

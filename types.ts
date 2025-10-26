@@ -12,6 +12,8 @@ export interface GeneratorFormState {
   tripName: string;
 }
 
+export type ActivityType = 'dining' | 'sightseeing' | 'accommodation' | 'transport' | 'activity';
+
 export interface Activity {
   time: string;
   description: string;
@@ -21,6 +23,7 @@ export interface Activity {
   alternatives?: string[];
   latitude?: number;
   longitude?: number;
+  type?: ActivityType;
 }
 
 export interface DayPlan {
@@ -29,6 +32,13 @@ export interface DayPlan {
   title: string;
   dailyCost: number;
   activities: Activity[];
+}
+
+export interface TravelAdvisories {
+  visaRequirements: string;
+  localCustoms: string;
+  safetyTips: string;
+  healthAndVaccinations: string;
 }
 
 export interface Itinerary {
@@ -40,6 +50,7 @@ export interface Itinerary {
   totalDays: number;
   totalCost: number;
   itinerary: DayPlan[];
+  travelAdvisories?: TravelAdvisories;
 }
 
 export interface FormOption {

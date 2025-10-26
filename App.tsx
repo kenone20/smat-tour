@@ -12,6 +12,7 @@ import { getSavedItineraries, saveItinerary, deleteItinerary } from './services/
 import type { GeneratorFormState, Itinerary, GenerationType } from './types';
 import { GlobeAltIcon } from './components/IconComponents';
 import { useTranslation } from './contexts/LanguageContext';
+import { INITIAL_FORM_STATE } from './constants';
 
 type ActiveModal = 'howToUse' | 'about' | null;
 
@@ -21,13 +22,14 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
+  const [formData, setFormData] = useState<GeneratorFormState>(INITIAL_FORM_STATE);
   const { t, language } = useTranslation();
 
   useEffect(() => {
     setSavedTrips(getSavedItineraries());
   }, []);
 
-  const handleGenerateItinerary = useCallback(async (formData: GeneratorFormState, type: GenerationType) => {
+  const handleGenerateItinerary = useCallback(async (type: GenerationType) => {
     setIsLoading(true);
     setError(null);
     setItinerary(null);
@@ -46,7 +48,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [language]);
+  }, [formData, language]);
 
   const handleLoadItinerary = useCallback((tripToLoad: Itinerary) => {
     setItinerary(tripToLoad);
@@ -61,6 +63,10 @@ const App: React.FC = () => {
     setSavedTrips(updatedSavedTrips);
   }, [itinerary]);
 
+  const handleDestinationChange = useCallback((newDestination: string) => {
+    setFormData(prev => ({ ...prev, destination: newDestination }));
+  }, []);
+
   const getModalTitle = () => {
     switch (activeModal) {
       case 'howToUse': return t('howToUse_title');
@@ -70,15 +76,22 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
       <Header 
         onShowHowToUse={() => setActiveModal('howToUse')}
         onShowAbout={() => setActiveModal('about')}
+        destination={formData.destination}
+        onDestinationChange={handleDestinationChange}
       />
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-4">
-            <GeneratorForm onGenerate={handleGenerateItinerary} isLoading={isLoading} />
+            <GeneratorForm 
+              onGenerate={handleGenerateItinerary} 
+              isLoading={isLoading} 
+              formData={formData}
+              setFormData={setFormData}
+            />
             <SavedTrips
               trips={savedTrips}
               onLoad={handleLoadItinerary}
@@ -88,18 +101,18 @@ const App: React.FC = () => {
           <div className="lg:col-span-8">
             {isLoading && <LoadingScreen />}
             {error && (
-              <div className="flex flex-col items-center justify-center text-center p-8 bg-red-50 border-2 border-red-200 rounded-2xl shadow-lg mt-12 w-full min-h-[50vh]">
-                  <h3 className="text-2xl font-bold text-red-800">{t('error_title')}</h3>
-                  <p className="text-red-600 mt-2">{error}</p>
-                  <p className="text-sm text-slate-500 mt-4">{t('error_message')}</p>
+              <div className="flex flex-col items-center justify-center text-center p-8 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-500/30 rounded-2xl shadow-lg mt-12 w-full min-h-[50vh]">
+                  <h3 className="text-2xl font-bold text-red-800 dark:text-red-300">{t('error_title')}</h3>
+                  <p className="text-red-600 dark:text-red-400 mt-2">{error}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-4">{t('error_message')}</p>
               </div>
             )}
             {itinerary && !isLoading && <ItineraryDisplay itinerary={itinerary} />}
             {!itinerary && !isLoading && !error && (
-              <div className="flex flex-col items-center justify-center text-center p-8 bg-white rounded-2xl shadow-lg mt-12 w-full min-h-[50vh]">
-                  <GlobeAltIcon className="w-16 h-16 text-slate-300" />
-                  <h3 className="text-2xl font-bold text-secondary mt-6">{t('welcome_title')}</h3>
-                  <p className="text-slate-500 mt-2 max-w-md">
+              <div className="flex flex-col items-center justify-center text-center p-8 bg-white dark:bg-slate-800 rounded-2xl shadow-lg mt-12 w-full min-h-[50vh]">
+                  <GlobeAltIcon className="w-16 h-16 text-slate-300 dark:text-slate-600" />
+                  <h3 className="text-2xl font-bold text-secondary dark:text-slate-200 mt-6">{t('welcome_title')}</h3>
+                  <p className="text-slate-500 dark:text-slate-400 mt-2 max-w-md">
                       {t('welcome_subtitle')}
                   </p>
               </div>
@@ -107,7 +120,7 @@ const App: React.FC = () => {
           </div>
         </div>
       </main>
-      <footer className="text-center py-6 text-slate-500 text-sm">
+      <footer className="text-center py-6 text-slate-500 dark:text-slate-400 text-sm">
         <p>{t('footer_copyright', { year: new Date().getFullYear() })}</p>
       </footer>
 

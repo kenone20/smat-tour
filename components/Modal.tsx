@@ -35,7 +35,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4 animate-fade-in-fast"
+      className="fixed inset-0 bg-black/60 dark:bg-black/80 z-50 flex justify-center items-center p-4 animate-fade-in-fast"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -43,20 +43,20 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
     >
       <div
         ref={modalRef}
-        className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col animate-scale-in"
+        className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col animate-scale-in"
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
       >
-        <header className="flex items-center justify-between p-4 border-b border-slate-200">
-          <h2 id="modal-title" className="text-xl font-bold text-secondary">{title}</h2>
+        <header className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
+          <h2 id="modal-title" className="text-xl font-bold text-secondary dark:text-slate-200">{title}</h2>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-500 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
+            className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
             aria-label={t('modal_close')}
           >
             <XMarkIcon className="w-6 h-6" />
           </button>
         </header>
-        <main className="p-6 overflow-y-auto">
+        <main className="p-6 overflow-y-auto text-slate-600 dark:text-slate-300">
           {children}
         </main>
       </div>

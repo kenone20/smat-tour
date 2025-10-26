@@ -10,7 +10,7 @@ const LanguageSwitcher: React.FC = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-1 rtl:space-x-reverse text-slate-600 hover:text-primary transition-colors"
+        className="flex items-center space-x-1 rtl:space-x-reverse text-slate-600 dark:text-slate-300 hover:text-primary transition-colors"
         aria-haspopup="true"
         aria-expanded={isOpen}
       >
@@ -20,7 +20,7 @@ const LanguageSwitcher: React.FC = () => {
       </button>
       {isOpen && (
         <ul
-          className="absolute ltr:right-0 rtl:left-0 mt-2 w-32 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+          className="absolute ltr:right-0 rtl:left-0 mt-2 w-32 bg-white dark:bg-slate-700 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
           onMouseLeave={() => setIsOpen(false)}
         >
           {availableLanguages.map(({ code, name }) => (
@@ -33,8 +33,8 @@ const LanguageSwitcher: React.FC = () => {
                 className={`w-full ltr:text-left rtl:text-right px-4 py-2 text-sm ${
                   language === code
                     ? 'bg-primary/10 text-primary font-semibold'
-                    : 'text-slate-700'
-                } hover:bg-slate-100`}
+                    : 'text-slate-700 dark:text-slate-200'
+                } hover:bg-slate-100 dark:hover:bg-slate-600`}
               >
                 {name}
               </button>

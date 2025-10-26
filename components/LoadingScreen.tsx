@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { SparklesIcon } from './IconComponents';
 import { useTranslation } from '../contexts/LanguageContext';
@@ -25,13 +26,13 @@ const LoadingScreen: React.FC = () => {
   }, [loadingMessages.length]);
 
   return (
-    <div className="flex flex-col items-center justify-center text-center p-8 bg-white rounded-2xl shadow-lg mt-12 w-full min-h-[50vh]">
+    <div className="flex flex-col items-center justify-center text-center p-8 bg-white dark:bg-slate-800 rounded-2xl shadow-lg mt-12 w-full min-h-[50vh]">
       <SparklesIcon className="w-16 h-16 text-primary animate-pulse" />
-      <h2 className="text-3xl font-bold text-secondary mt-6">{t('loading_title')}</h2>
-      <div className="mt-4 text-slate-500 h-6">
+      <h2 className="text-3xl font-bold text-secondary dark:text-slate-200 mt-6">{t('loading_title')}</h2>
+      <div className="mt-4 text-slate-500 dark:text-slate-400 h-6">
         <p className="transition-opacity duration-500 ease-in-out">{loadingMessages[messageIndex]}</p>
       </div>
-      <div className="w-full bg-slate-200 rounded-full h-2.5 mt-8 overflow-hidden">
+      <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 mt-8 overflow-hidden">
         <div className="bg-primary h-2.5 rounded-full animate-progress"></div>
       </div>
       <style>{`

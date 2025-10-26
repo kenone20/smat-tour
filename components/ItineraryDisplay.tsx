@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Itinerary, DayPlan, Activity } from '../types';
+import type { Itinerary, DayPlan, Activity, TravelAdvisories } from '../types';
 import {
     CalendarIcon,
     ClockIcon,
@@ -10,7 +10,11 @@ import {
     ShareIcon,
     ArrowDownTrayIcon,
     ListBulletIcon,
-    MapIcon
+    MapIcon,
+    ShieldCheckIcon,
+    UserGroupIcon,
+    DocumentTextIcon,
+    HeartIcon
 } from './IconComponents';
 import { useTranslation } from '../contexts/LanguageContext';
 import MapView from './MapView';
@@ -101,6 +105,7 @@ const ItineraryDisplay: React.FC<ItineraryDisplayProps> = ({ itinerary }) => {
                 scale: 2, 
                 useCORS: true,
                 logging: false,
+                backgroundColor: window.getComputedStyle(document.body).getPropertyValue('background-color'),
             });
 
             const imgData = canvas.toDataURL('image/png');
@@ -143,13 +148,13 @@ const ItineraryDisplay: React.FC<ItineraryDisplayProps> = ({ itinerary }) => {
 
 
     return (
-        <div className="bg-white rounded-2xl shadow-lg mt-12 w-full animate-fade-in">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg mt-12 w-full animate-fade-in">
             <div className="p-6 md:p-8">
-                <div className="border-b border-slate-200 pb-6 mb-6">
+                <div className="border-b border-slate-200 dark:border-slate-700 pb-6 mb-6">
                     <div className="flex justify-between items-start">
                         <div>
-                            <h2 className="text-3xl md:text-4xl font-bold text-secondary">{itinerary.tripName}</h2>
-                            <div className="flex items-center mt-2 text-slate-500">
+                            <h2 className="text-3xl md:text-4xl font-bold text-secondary dark:text-slate-200">{itinerary.tripName}</h2>
+                            <div className="flex items-center mt-2 text-slate-500 dark:text-slate-400">
                                 <MapPinIcon className="w-5 h-5 ltr:mr-2 rtl:ml-2" />
                                 <span>{itinerary.destination}</span>
                             </div>
@@ -160,7 +165,7 @@ const ItineraryDisplay: React.FC<ItineraryDisplayProps> = ({ itinerary }) => {
                                     onClick={handleDownloadPdf}
                                     title={t('itinerary_download_title')}
                                     disabled={isDownloadingPdf}
-                                    className="p-2 text-slate-500 hover:text-primary hover:bg-primary/10 rounded-full transition-colors disabled:text-slate-300 disabled:cursor-wait"
+                                    className="p-2 text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-primary/10 rounded-full transition-colors disabled:text-slate-300 dark:disabled:text-slate-500 disabled:cursor-wait"
                                 >
                                     {isDownloadingPdf ? (
                                         <svg className="animate-spin h-6 w-6 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="http://www.w3.org/2000/svg">
@@ -174,19 +179,19 @@ const ItineraryDisplay: React.FC<ItineraryDisplayProps> = ({ itinerary }) => {
                                  <button
                                     onClick={handleShare}
                                     title={t('itinerary_share_title')}
-                                    className="p-2 text-slate-500 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
+                                    className="p-2 text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
                                 >
                                     <ShareIcon className="w-6 h-6" />
                                 </button>
                                 <button
                                     onClick={handleCopy}
                                     title={t('itinerary_copy_title')}
-                                    className="p-2 text-slate-500 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
+                                    className="p-2 text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
                                 >
                                     <DocumentDuplicateIcon className="w-6 h-6" />
                                 </button>
                             </div>
-                            <div className="bg-slate-100 rounded-full p-1 flex space-x-1 rtl:space-x-reverse">
+                            <div className="bg-slate-100 dark:bg-slate-700 rounded-full p-1 flex space-x-1 rtl:space-x-reverse">
                                 <ViewToggleButton icon={<ListBulletIcon className="w-5 h-5" />} label={t('itinerary_view_list')} isActive={viewMode === 'list'} onClick={() => setViewMode('list')} />
                                 <ViewToggleButton icon={<MapIcon className="w-5 h-5" />} label={t('itinerary_view_map')} isActive={viewMode === 'map'} onClick={() => setViewMode('map')} />
                             </div>
@@ -197,6 +202,7 @@ const ItineraryDisplay: React.FC<ItineraryDisplayProps> = ({ itinerary }) => {
                 <div id="itinerary-content-render">
                     {viewMode === 'list' && (
                         <>
+                            {itinerary.travelAdvisories && <TravelAdvisoriesCard advisories={itinerary.travelAdvisories} />}
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8 text-center">
                                 <StatCard icon={<CalendarIcon className="w-6 h-6 text-primary" />} label={t('itinerary_stat_duration')} value={t('days', {count: itinerary.totalDays})} />
                                 <StatCard icon={<CurrencyDollarIcon className="w-6 h-6 text-primary" />} label={t('itinerary_stat_cost')} value={`$${itinerary.totalCost.toLocaleString()}`} />
@@ -239,8 +245,8 @@ const ViewToggleButton: React.FC<ViewToggleButtonProps> = ({ icon, label, isActi
         title={label}
         className={`flex items-center space-x-2 rtl:space-x-reverse px-3 py-1.5 rounded-full text-sm transition-colors ${
             isActive
-                ? 'bg-white text-primary shadow-sm'
-                : 'text-slate-500 hover:bg-slate-200'
+                ? 'bg-white dark:bg-slate-800 text-primary shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
         }`}
     >
         {icon}
@@ -250,25 +256,67 @@ const ViewToggleButton: React.FC<ViewToggleButtonProps> = ({ icon, label, isActi
 
 
 const StatCard: React.FC<{ icon: React.ReactElement, label: string, value: string, className?: string }> = ({ icon, label, value, className = '' }) => (
-    <div className={`bg-slate-50 p-4 rounded-lg flex flex-col items-center justify-center ${className}`}>
+    <div className={`bg-slate-50 dark:bg-slate-700/50 p-4 rounded-lg flex flex-col items-center justify-center ${className}`}>
         {icon}
-        <p className="text-sm text-slate-500 mt-1">{label}</p>
-        <p className="text-lg font-bold text-secondary">{value}</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{label}</p>
+        <p className="text-lg font-bold text-secondary dark:text-slate-200">{value}</p>
     </div>
 );
+
+const TravelAdvisoriesCard: React.FC<{ advisories: TravelAdvisories }> = ({ advisories }) => {
+    const { t } = useTranslation();
+    return (
+        <div className="mb-8 border border-amber-300 dark:border-amber-500/50 bg-amber-50/50 dark:bg-amber-900/20 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-amber-900 dark:text-amber-200 mb-4">{t('itinerary_travel_advisories_title')}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                <AdvisoryItem
+                    icon={<DocumentTextIcon className="w-6 h-6 text-amber-600 dark:text-amber-400" />}
+                    title={t('itinerary_visa_requirements')}
+                    content={advisories.visaRequirements}
+                />
+                <AdvisoryItem
+                    icon={<UserGroupIcon className="w-6 h-6 text-amber-600 dark:text-amber-400" />}
+                    title={t('itinerary_local_customs')}
+                    content={advisories.localCustoms}
+                />
+                <AdvisoryItem
+                    icon={<ShieldCheckIcon className="w-6 h-6 text-amber-600 dark:text-amber-400" />}
+                    title={t('itinerary_safety_tips')}
+                    content={advisories.safetyTips}
+                />
+                <AdvisoryItem
+                    icon={<HeartIcon className="w-6 h-6 text-amber-600 dark:text-amber-400" />}
+                    title={t('itinerary_health_vaccinations')}
+                    content={advisories.healthAndVaccinations}
+                />
+            </div>
+        </div>
+    );
+};
+
+const AdvisoryItem: React.FC<{ icon: React.ReactElement, title: string, content: string }> = ({ icon, title, content }) => (
+    <div className="flex items-start space-x-3 rtl:space-x-reverse">
+        <div className="flex-shrink-0 pt-1">{icon}</div>
+        <div>
+            <h4 className="font-semibold text-amber-800 dark:text-amber-300">{title}</h4>
+            <p className="text-sm text-slate-600 dark:text-slate-400">{content}</p>
+        </div>
+    </div>
+);
+
 
 const DayCard: React.FC<{ day: DayPlan }> = ({ day }) => {
     const { t } = useTranslation();
     return (
-        <div className="border border-slate-200 rounded-xl p-6">
+        <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
                 <div>
                     <h3 className="text-xl font-bold text-primary">{t('itinerary_day')} {day.day} - {day.title}</h3>
-                    <p className="text-sm text-slate-500">{day.date}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{day.date}</p>
                 </div>
                 <div className="text-right rtl:text-left">
-                    <p className="text-lg font-semibold text-secondary">${day.dailyCost}</p>
-                    <p className="text-xs text-slate-400">{t('itinerary_dailyCost_label')}</p>
+                    <p className="text-lg font-semibold text-secondary dark:text-slate-200">${day.dailyCost}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">{t('itinerary_dailyCost_label')}</p>
                 </div>
             </div>
 
@@ -284,15 +332,15 @@ const DayCard: React.FC<{ day: DayPlan }> = ({ day }) => {
 const ActivityCard: React.FC<{ activity: Activity }> = ({ activity }) => {
     const { t } = useTranslation();
     return (
-        <div className="flex items-start space-x-4 rtl:space-x-reverse p-4 bg-slate-50/50 rounded-lg">
+        <div className="flex items-start space-x-4 rtl:space-x-reverse p-4 bg-slate-50/50 dark:bg-slate-700/40 rounded-lg">
             <div className="flex-shrink-0 w-20 text-center">
                 <p className="font-bold text-primary">{activity.time}</p>
             </div>
             <div className="flex-1 ltr:border-l-2 rtl:border-r-2 border-primary/20 ltr:pl-4 rtl:pr-4">
-                <p className="font-semibold text-slate-800">{activity.description}</p>
-                <div className="text-sm text-slate-500 mt-1 space-y-1">
-                    <p>{t('itinerary_activity_cost_label')} <span className="font-medium text-slate-600">{activity.estimatedCost}</span></p>
-                    {activity.transport && <p>{t('itinerary_activity_transport_label')} <span className="font-medium text-slate-600">{activity.transport}</span></p>}
+                <p className="font-semibold text-slate-800 dark:text-slate-200">{activity.description}</p>
+                <div className="text-sm text-slate-500 dark:text-slate-400 mt-1 space-y-1">
+                    <p>{t('itinerary_activity_cost_label')} <span className="font-medium text-slate-600 dark:text-slate-300">{activity.estimatedCost}</span></p>
+                    {activity.transport && <p>{t('itinerary_activity_transport_label')} <span className="font-medium text-slate-600 dark:text-slate-300">{activity.transport}</span></p>}
                     {activity.bookingLink && (
                         <a href={activity.bookingLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-primary hover:underline">
                             <LinkIcon className="w-4 h-4 ltr:mr-1 rtl:ml-1" />
@@ -301,7 +349,7 @@ const ActivityCard: React.FC<{ activity: Activity }> = ({ activity }) => {
                     )}
                     {activity.alternatives && activity.alternatives.length > 0 && (
                         <div className="pt-2">
-                            <p className="font-medium text-slate-600">{t('itinerary_activity_alternatives_label')}</p>
+                            <p className="font-medium text-slate-600 dark:text-slate-300">{t('itinerary_activity_alternatives_label')}</p>
                             <ul className="list-disc ltr:list-inside rtl:list-inside rtl:pr-4">
                                 {activity.alternatives.map((alt, i) => <li key={i}>{alt}</li>)}
                             </ul>
